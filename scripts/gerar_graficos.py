@@ -10,12 +10,11 @@ try:
     colunas_esperadas = ['ax', 'ay', 'az', 'vx', 'vy', 'vz', 'px', 'py', 'pz']
     
     # Se a primeira coluna não for 'ax', define os nomes manualmente
-    if 'ax' not in [col.strip() for col in primeira_linha.columns]:
-        df = pd.read_csv('dados_cinematicos.csv', names=colunas_esperadas, header=None)
-    else:
-        df = pd.read_csv('dados_cinematicos.csv')
-        df.columns = df.columns.str.strip()  # Remove espaços acidentais nos nomes
-
+    with open('dados_cinematicos.csv') as f:
+        linhas = f.readlines()
+    inicio = max((i for i, l in enumerate(linhas) if l.startswith('ax')), default=-1)
+    df = pd.read_csv('dados_cinematicos.csv', names=colunas_esperadas,
+                    header=None, skiprows=inicio + 1)
     # Garante que as colunas sejam tratadas como números (descarta linhas corrompidas se houver)
     for col in colunas_esperadas:
         df[col] = pd.to_numeric(df[col], errors='coerce')

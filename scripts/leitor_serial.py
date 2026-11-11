@@ -4,7 +4,7 @@ import time
 import sys
 
 # ================= CONFIGURAÇÕES =================
-PORTA_SERIAL = 'COM6'
+PORTA_SERIAL = '/dev/ttyACM0' 
 BAUD_RATE = 115200
 ARQUIVO_CSV = 'dados_cinematicos.csv'
 # =================================================
@@ -26,14 +26,20 @@ def iniciar_leitura():
                     
                     if not linha:
                         continue
-                        
+
+                    if linha.startswith('#'):
+                        print(linha)
+                        continue
+
                     dados = linha.split(',')
                     
-                    if not cabecalho_lido and len(dados) == 9:
-                        escritor_csv.writerow(dados)
-                        print("Cabeçalho identificado e gravado:", dados)
-                        cabecalho_lido = True
-                    elif cabecalho_lido and len(dados) == 9:
+                    if not cabecalho_lido:
+                        if linha.startswith('ax') and len(dados) == 9:
+                            escritor_csv.writerow(dados)
+                            print("Cabeçalho identificado e gravado:", dados)
+                            cabecalho_lido = True
+                        continue
+                    if len(dados) == 9:
                         escritor_csv.writerow(dados)
                         print(f"Dado salvo: {dados}")
                         
